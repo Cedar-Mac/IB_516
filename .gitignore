@@ -1,0 +1,6 @@
+#ignore data folder
+data/
+
+# Ignore Rproj files
+*.Rproj
+Rproj.user
