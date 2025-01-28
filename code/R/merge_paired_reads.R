@@ -1,17 +1,17 @@
 # Load packages
-packages <- c('JAMP', 'tidyverse', 'vegan')
+packages <- c('JAMP', 'tidyverse', 'vegan', 'here')
 lapply(packages, library, character.only = T)
-source("code/JAMP_folder_rename.R")
+source("code/R/JAMP_folder_rename.R")
 
 
-merge_reads <- function(path_to_data=""){
+merge_reads <- function(){
 # Make sure that all reads are paired, sudo check that no files were left behind
 first_reads <- list.files(
-  path = here("input_files", "_data"), 
+  path = here("data", "test_data"), 
   pattern = ".*R1.fastq", 
   full.names = TRUE)
 second_reads <- list.files(
-  path = here("input_files", "_data"), 
+  path = here("data", "test_data"), 
   pattern = ".*R2.fastq", 
   full.names = TRUE)
 unmerged_file_names <- data.frame(first_reads, second_reads) 
@@ -43,3 +43,6 @@ if (length(list.files(here("A_merge_PE", "_data"))) ==
   }
 
 }
+
+
+merge_reads()

@@ -4,3 +4,4 @@ data/
 # Ignore Rproj files
 *.Rproj
 Rproj.user
+.Rproj.user

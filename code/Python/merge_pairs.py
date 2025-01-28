@@ -1,8 +1,8 @@
-import os, re, subprocess
+import os, re, sys, subprocess
 
 def merge_pairs(data_dir:str):
     """
-    Merges paired fastq reads using vsearch algorithm.
+    Merges paired fastq reads using the vsearch algorithm.
 
     Arguments:
 
@@ -44,23 +44,28 @@ def merge_pairs(data_dir:str):
     # make output directory for merged files
     if "merged" not in os.listdir(data_dir):
         os.makedirs(f"{data_dir}/merged/")
-    #if "logs" not in os.listdir(data_dir):
-        #os.makedirs(f"{data_dir}/logs/") 
+    if "logs" not in os.listdir(f"{data_dir}/merged/"):
+        os.makedirs(f"{data_dir}/../merge_logs/") 
 
     # Use VSEARCH fastq_mergepairs function
-    for fastq_name in fwd_files:
+    for name in fwd_bare_names:
+        old_stdout = sys.stdout
+        log_file = open(f"{data_dir}/../merge_logs/{name}.log", "w")
+        sys.stdout = log_file
+
         vsearch_merge_call = ["vsearch", 
-                                "--fastq_mergepairs", f"{data_dir}/{fastq_name}", 
-                                "--reverse", f"{data_dir}/{fastq_name}", 
-                                "--fastqout", f"{data_dir}/merged/{fastq_name[0:-len(fastq_suffix)]}_merged.fastq",
-                                #"-log", f"{data_dir}/logs/{fastq_name}[0:-len(fastq_suffix)].log", 
+                                "--fastq_mergepairs", f"{data_dir}/{name}_R1.fastq", 
+                                "--reverse", f"{data_dir}/{name}_R2.fastq", 
+                                "--fastqout", f"{data_dir}/merged/{name}_merged.fastq",
                                 "--fastq_maxdiffs", "99", 
                                 "--fastq_minovlen", "16",
                                 "--fastq_maxdiffpct", "25",
                                 "--fastq_allowmergestagger"]
-
+        
+        sys.stdout = old_stdout
+        log_file.close()
 
         subprocess.check_call(vsearch_merge_call)
-
+        
 
 merge_pairs("../../data/test_data")
