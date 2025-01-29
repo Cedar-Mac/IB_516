@@ -5,7 +5,8 @@ def trim_primers(data_dir: str, primer_option:int=1):
     merged_suffix = "_merged.fastq"
 
     
-    # default primer option uses the EPTDr2n COI primer set
+    # default primer option uses the EPTDr2n COI primer set.
+    # Check with Jared about which are necessary (seems like only main primers required for filtering)
     if primer_option == 1:
         fwd_main = "GGDACWGGWTGAACWGTWTAYCCHCC"
         fwd_primer_1 = "GACACTCTTTCCCTACACGACGCTCTTCCGATCTGGDACWGGWTGAACWGTWTAYCCHCC"
