@@ -1,10 +1,42 @@
 import os, subprocess
 
 def trim_primers(data_dir: str, primer_option:int=1):
-    complement = {"A":"T", "T":"A", "C":"G", "G":"C", "N":"N", "Y":"R", "R":"Y", "W":"W", "D":"H", "H":"D"} 
+    """
+    Inputs:
+        data_dir: String specifying data directory
+        primer_option: Integer specifying the primer set to use
+            1 = invertebrate COI
+            Anything else: not supported yet
+        
+    cutadapt arguments:
+        -g: The 5' primer sequence. I anchor the fwd primer with ^
+        -a: The 3' primer sequence. Not anchored
+        --discard_untrimmed: Get rid of sequences with no matching primer
+        -n: Number of times to repeat. Cutadapt only removes one primer at a time.
+            Repeat twice to remove fwd and rvs primers.
+        -o: output file
+        --error-rate: What fraction of bases can not match the primer sequence.
+                        Set to 0.1 in line with JAMP.
+    
+    Outputs:
+        Trimmed sequences output in sub-folder of data directory in fastq format.
+    """
+
+    # Complementary base pairings for making the reverse complement of a primer sequence.
+    # Necessary for the reverse primer after merging paired-end reads
+    complement = {"A":"T", 
+                  "T":"A",
+                  "C":"G",
+                  "G":"C",
+                  "N":"N",
+                  "Y":"R",
+                  "R":"Y",
+                  "W":"W",
+                  "D":"H",
+                  "H":"D"} 
+    
     merged_suffix = "_merged.fastq"
 
-    
     # default primer option uses the EPTDr2n COI primer set.
     # Check with Jared about which are necessary (seems like only main primers required for filtering)
     if primer_option == 1:
