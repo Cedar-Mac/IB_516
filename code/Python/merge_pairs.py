@@ -1,6 +1,6 @@
-import os, re, subprocess_tee
+import os, re, subprocess, shutil
 
-def merge_pairs(data_dir:str):
+def merge_pairs(data_dir:str, vsearch_args:list=["99", "16", "25", "--fastq_allowmergestagger"]):
     """
     Merges paired fastq reads using the vsearch algorithm.
 
@@ -10,19 +10,19 @@ def merge_pairs(data_dir:str):
 
     vsearch arguments:
 
-    --fastq_mergepairs: specify the maximum number of non-matching nucleotides 
-                        allowed in the overlap region. That option has a strong 
-                        influence on the merging success rate. Set to 99 a la JAMP.
-    --fastq_minovlen: Minimum overlap between paired sequences to merge. JAMP default is 16,
-                        base default is 10. Currently set to JAMP default.
-    --fastq_diffpct: Maximum allowed percent difference between the two paired sequences. 
-                        vsearch default is 100%, JAMP sets the default to 25%
-                        I'm using vsearch default.
-    --fastq_allowmergestagger: Allows for reads to be staggered, this is following JAMP convention.
+        --fastq_mergepairs: specify the maximum number of non-matching nucleotides 
+                            allowed in the overlap region. That option has a strong 
+                            influence on the merging success rate. Set to 99 a la JAMP.
+        --fastq_minovlen: Minimum overlap between paired sequences to merge. JAMP default is 16,
+                            base default is 10. Currently set to JAMP default.
+        --fastq_diffpct: Maximum allowed percent difference between the two paired sequences. 
+                            vsearch recommended default is 100%, JAMP sets the default to 25%
+                            I'm using the JAMP default.
+        --fastq_allowmergestagger: Allows for reads to be staggered, this is following JAMP convention.
 
     Output:
 
-    Merged fastq files in merged directory within data directory.
+        Merged fastq files in merged directory within data directory.
     """
 
     data_files = os.listdir(data_dir)
@@ -41,9 +41,12 @@ def merge_pairs(data_dir:str):
         print("Not all reads are paired!")
         exit()
 
+    # Remove old directory and files
+    if "merged" in os.listdir(data_dir):
+        shutil.rmtree(f"{data_dir}/merged/")
+
     # make output directory for merged files
-    if "merged" not in os.listdir(data_dir):
-        os.makedirs(f"{data_dir}/merged/")
+    os.makedirs(f"{data_dir}/merged/")
 
     #Make output directory for logs
     if "logs" not in os.listdir(f"{data_dir}/merged/"):
@@ -56,15 +59,11 @@ def merge_pairs(data_dir:str):
                                 "--fastq_mergepairs", f"{data_dir}/{name}_R1.fastq", 
                                 "--reverse", f"{data_dir}/{name}_R2.fastq", 
                                 "--fastqout", f"{data_dir}/merged/{name}_merged.fastq",
-                                "--fastq_maxdiffs", "99", 
-                                "--fastq_minovlen", "16",
-                                "--fastq_maxdiffpct", "25",
-                                "--fastq_allowmergestagger"]
+                                "--fastq_maxdiffs", f"{vsearch_args[0]}", 
+                                "--fastq_minovlen", f"{vsearch_args[1]}",
+                                "--fastq_maxdiffpct", f"{vsearch_args[2]}",
+                                f"{vsearch_args[3]}"]
 
-        result = subprocess_tee.run(vsearch_merge_call)
-        log_io = open(f"{data_dir}/../merge_logs/{name}.log", "a")
-        log_io.write(result.stdout)
-        log_io.close()
- 
+        subprocess.check_call(vsearch_merge_call)
 
 merge_pairs("../../data/test_data")

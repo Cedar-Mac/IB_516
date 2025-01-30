@@ -1,4 +1,4 @@
-import os, subprocess
+import os, subprocess, shutil
 
 def trim_primers(data_dir: str, primer_option:int=1):
     """
@@ -59,9 +59,12 @@ def trim_primers(data_dir: str, primer_option:int=1):
         rv_comp_3 = "".join(complement.get(base, base) for base in reversed(rvs_primer_3))
         rv_comp_4 = "".join(complement.get(base, base) for base in reversed(rvs_primer_4))
     
+    # Remove old directory and files
+    if "trimmed" in os.listdir(data_dir):
+        shutil.rmtree(f"{data_dir}/trimmed/")
+
     # make output directory for trimmed files
-    if "trimmed" not in os.listdir(data_dir):
-        os.makedirs(f"{data_dir}/trimmed/")
+    os.makedirs(f"{data_dir}/trimmed/")
 
     # cutadapt call to trim files in the "merged" subdirectory
     for file in os.listdir(f"{data_dir}/merged/"):

@@ -1,6 +1,6 @@
-import os
+import os, shutil
 
-trimmed_suffix = "_trimmed.fastq"
+fastq_suffix = ".fastq"
 
 def length_filter(data_dir:str, amplicon_length:int):
     """
@@ -12,10 +12,12 @@ def length_filter(data_dir:str, amplicon_length:int):
         Trimmed sequences as fasta files in subfolder of data directory
     """
 
-    # make output directory for length-filtered files
+    # Remove old files and make output directory for length-filtered files
+    if "length_filtered" in os.listdir(data_dir):
+        shutil.rmtree(f"{data_dir}/length_filtered/")
+
     if "length_filtered" not in os.listdir(data_dir):
         os.makedirs(f"{data_dir}/length_filtered/")
-    
 
     for data_file in os.listdir(f"{data_dir}/quality_filtered/"):
         if "fastq" in data_file:
@@ -23,10 +25,13 @@ def length_filter(data_dir:str, amplicon_length:int):
             kepper_counts = 0 # Keep track of kept sequences
 
             log_file = open(f"{data_dir}/length_filtered/length_filter.log", "a")
-            in_file = open(f"{data_dir}/trimmed/{data_file}", "r")
-            out_file = open(f"{data_dir}/length_filtered/{data_file[0:-len(trimmed_suffix)]}.fasta", "a")
+            in_file = open(f"{data_dir}/quality_filtered/{data_file}", "r")
+            out_file = open(f"{data_dir}/length_filtered/{data_file[0:-len(fastq_suffix)]}.fasta", "a")
 
-            for line in in_file:
+            lines = in_file.readlines()
+
+            # Sequences are every 4th line. Skip headers and quality scores.
+            for line in lines[1::4]:
                 if len(line) == amplicon_length:
                     out_file.write(f">{line}")
                     kepper_counts += 1
@@ -34,7 +39,7 @@ def length_filter(data_dir:str, amplicon_length:int):
                     rm_counts += 1
             out_file.close()
             in_file.close()
-            log_file.write(f"{data_file} had {rm_counts} lines removed and {kepper_counts} sequences were kept")
+            log_file.write(f"{data_file} had {rm_counts} lines removed and {kepper_counts} sequences were kept.\n\n")
     log_file.close()
 
 
