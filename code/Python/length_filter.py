@@ -31,14 +31,13 @@ def length_filter(data_dir:str, amplicon_length:int):
 
             lines = in_file.readlines()
 
-            # This is big brain play here.
             # Iterate over pairs of lines.
             for i, pair in enumerate(pairwise(lines)):
                 if (i % 4 == 0) and (len(pair[1]) == amplicon_length): # if current line is a header and next line is a keeper sequence
                     out_file.write(f">{pair[0]}") # write header line
                 if i % 4 == 1:
                     if len(pair[0]) == amplicon_length: # if current line is a keeper sequence
-                        out_file.write(f"{pair[0]}") #write keeper sequence
+                        out_file.write(f"{pair[0]}") # write keeper sequence
                         kepper_counts += 1
                     if len(pair[0]) != 142: # sequence was not correct length, keep track of skipped sequences.
                         rm_counts += 1
