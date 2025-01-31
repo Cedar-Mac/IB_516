@@ -4,7 +4,7 @@ def merge_pairs(data_dir:str, vsearch_args:list=["99", "16", "25", "--fastq_allo
     """
     Merges paired fastq reads using the vsearch algorithm.
 
-    Arguments:
+    Input:
 
         data_dir: string providing the path to the data directory with raw input fastq files.
 
