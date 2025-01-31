@@ -1,4 +1,5 @@
 import os, shutil
+from itertools import pairwise
 
 fastq_suffix = ".fastq"
 
@@ -30,16 +31,20 @@ def length_filter(data_dir:str, amplicon_length:int):
 
             lines = in_file.readlines()
 
-            # Sequences are every 4th line. Skip headers and quality scores.
-            for line in lines[1::4]:
-                if len(line) == amplicon_length:
-                    out_file.write(f">{line}")
-                    kepper_counts += 1
-                if len(line) != 142:
-                    rm_counts += 1
+            # This is big brain play here.
+            # Iterate over pairs of lines.
+            for i, pair in enumerate(pairwise(lines)):
+                if (i % 4 == 0) and (len(pair[1]) == amplicon_length): # if current line is a header and next line is a keeper sequence
+                    out_file.write(f">{pair[0]}") # write header line
+                if i % 4 == 1:
+                    if len(pair[0]) == amplicon_length: # if current line is a keeper sequence
+                        out_file.write(f"{pair[0]}") #write keeper sequence
+                        kepper_counts += 1
+                    if len(pair[0]) != 142: # sequence was not correct length, keep track of skipped sequences.
+                        rm_counts += 1
             out_file.close()
             in_file.close()
-            log_file.write(f"{data_file} had {rm_counts} lines removed and {kepper_counts} sequences were kept.\n\n")
+            log_file.write(f"{data_file} had {rm_counts} sequences removed and {kepper_counts} sequences were kept.\n\n")
     log_file.close()
 
 
