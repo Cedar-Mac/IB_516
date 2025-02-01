@@ -92,7 +92,7 @@ def trim_primers(data_dir: str, primer_option:int=1):
             with open(f"{data_dir}/trimmed/logs/{file[0:-len(merged_suffix)]}.log", "a") as log:
                 try:
                     subprocess.run(cutadapt_call, stdout=log, stderr=log, check=True)
-                    print(f"\nProcessed {file} successfully.\n")
+                    print(f"\nTrimmed {file} successfully.\n")
                 except subprocess.CalledProcessError as e:
                     print(f"\nError processing {file}: {e}\n")
 

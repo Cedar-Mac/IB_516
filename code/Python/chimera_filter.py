@@ -54,7 +54,7 @@ def chimera_filter(data_dir:str, vsearch_args:list=["1.4", "8", "3", "1.2", "0.2
             with open(f"{data_dir}/chimera_filtered/logs/{file[0:-len(fasta_suffix)]}.log", "a") as log:
                 try:
                     subprocess.run(vsearch_chimera_call, stdout=log, stderr=log, check=True)
-                    print(f"\nProcessed {file} successfully.\n")
+                    print(f"\nChimera filtered {file} successfully.\n")
                 except subprocess.CalledProcessError as e:
                     print(f"\nError processing {file}: {e}\n")
 

@@ -45,7 +45,7 @@ def quality_filter(data_dir:str, vsearch_args:list=[1, 0]):
             with open(f"{data_dir}/quality_filtered/logs/{file[0:-len(trimmed_suffix)]}.log", "a") as log:
                 try:
                     subprocess.run(vsearch_ee_filter_call, stdout=log, stderr=log, check=True)
-                    print(f"\nProcessed {file} successfully.\n")
+                    print(f"\nQuality filtered {file} successfully.\n")
                 except subprocess.CalledProcessError as e:
                     print(f"\nError processing {file}: {e}\n")
 

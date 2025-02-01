@@ -36,6 +36,9 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
     # make output directory for frequency filtered files
     os.makedirs(f"{data_dir}/freq_filtered/")
 
+    # Make subdirectory for log
+    os.makedirs(f"{data_dir}/freq_filtered/log/")
+
     # make temp directory for sorted counts
     os.makedirs(f"{data_dir}/freq_filtered/temp/")
 
@@ -79,7 +82,7 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
 
             with open(f"{data_dir}/freq_filtered/temp/{tmp_file}") as f:
                 out_file = open(f"{data_dir}/freq_filtered/{tmp_file}", "a")
-                log_file = open(f"{data_dir}/freq_filtered/freq_filter.log", "a")
+                log_file = open(f"{data_dir}/freq_filtered/log/freq_filter.log", "a")
 
                 for count, seq in zip(f, f):
                     if (site_occurances[seq] >= min_site_occurance) or (int(count) >= min_seq_count):
@@ -87,7 +90,7 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
                         out_file.write(seq)
                         i += 1
                     else:
-                        log_file.write(f"{seq} occured less than {min_seq_count} times at {tmp_file[0:-len(fasta_suffix)]} and was only present at {site_occurances[seq] - 1} other sites.\n")
+                        log_file.write(f"{seq} occured less than {min_seq_count} times at {tmp_file[0:-len(fasta_suffix)]} and was present at {site_occurances[seq] - 1} other sites.\n")
 
                 out_file.close()
     log_file.close()

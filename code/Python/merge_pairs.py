@@ -71,7 +71,7 @@ def merge_pairs(data_dir:str, vsearch_args:list=["99", "16", "25", "--fastq_allo
         with open(f"{data_dir}/merged/merge_logs/{name}.log", "a") as log:
             try:
                 subprocess.run(vsearch_merge_call, stdout=log, stderr=log, check=True)
-                print(f"\nProcessed {name} successfully.\n")
+                print(f"\nMerged {name} successfully.\n")
             except subprocess.CalledProcessError as e:
                 print(f"\nError processing {name}: {e}\n")
 
