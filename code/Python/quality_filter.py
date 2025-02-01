@@ -38,4 +38,5 @@ def quality_filter(data_dir:str, vsearch_args:list=[1, 0]):
         subprocess.check_call(vsearch_ee_filter_call)
 
 
-quality_filter(data_dir="../../data/test_data")
+if __name__ == "__main__":
+    quality_filter(data_dir="../../data/test_data")

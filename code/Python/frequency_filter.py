@@ -41,11 +41,11 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
 
     too_few_list = []
 
-    for file in os.listdir(f"{data_dir}/length_filtered/"):
+    for file in os.listdir(f"{data_dir}/chimera_filtered/"):
 
         if "fasta" in file:
             # open files
-            in_file = open(f"{data_dir}/length_filtered/{file}", "r")
+            in_file = open(f"{data_dir}/chimera_filtered/{file}", "r")
             temp_file = open(f"{data_dir}/freq_filtered/temp/{file}", "a")
 
             # Read lines in file into list
@@ -98,4 +98,5 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
         shutil.rmtree(f"{data_dir}/freq_filtered/temp/")
 
 
-frequency_filter("../../data/test_data", min_seq_count=3, min_site_occurance=3)
+if __name__ == "__main__":
+    frequency_filter("../../data/test_data", min_seq_count=3, min_site_occurance=3)

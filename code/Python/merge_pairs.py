@@ -66,4 +66,6 @@ def merge_pairs(data_dir:str, vsearch_args:list=["99", "16", "25", "--fastq_allo
 
         subprocess.check_call(vsearch_merge_call)
 
-merge_pairs("../../data/test_data")
+
+if __name__ == "__main__":
+    merge_pairs("../../data/test_data")

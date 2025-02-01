@@ -88,4 +88,6 @@ def trim_primers(data_dir: str, primer_option:int=1):
         
             subprocess.check_call(cutadapt_call)
 
-trim_primers(data_dir="../../data/test_data")
+
+if __name__ == "__main__":
+    trim_primers(data_dir="../../data/test_data")

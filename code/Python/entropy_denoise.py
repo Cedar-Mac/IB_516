@@ -12,7 +12,7 @@ def denoise(data_dir:str, DnoisE_args:list=["5", "2", "1", "-y"]):
         --alpha: alpha value
         -x:
         --min_abund:
-        -y
+        -y: Use entropy? -y for yes, otherwise no flag.
 
     """
 
@@ -24,7 +24,7 @@ def denoise(data_dir:str, DnoisE_args:list=["5", "2", "1", "-y"]):
     os.makedirs(f"{data_dir}/denoised/")
 
     for file in os.listdir(f"{data_dir}/freq_filtered/"):
-        if len(DnoisE_args) == 4:
+        if len(DnoisE_args) == 4: # With -y flag
             DnoisE_call = ["dnoise", 
                             "--fasta_input", f"{data_dir}/freq_filtered/{file}",
                             "--fasta_output", f"{data_dir}/denoised/{file}",
@@ -32,7 +32,8 @@ def denoise(data_dir:str, DnoisE_args:list=["5", "2", "1", "-y"]):
                             "-x", f"{DnoisE_args[1]}",
                             "--min_abund", f"{DnoisE_args[2]}",
                             "-y"]
-        if len(DnoisE_args) == 3:
+            
+        if len(DnoisE_args) == 3: # No -y flag
             DnoisE_call = ["dnoise", 
                             "--fasta_input", f"{data_dir}/freq_filtered/{file}",
                             "--fasta_output", f"{data_dir}/denoised/{file}",
@@ -43,4 +44,5 @@ def denoise(data_dir:str, DnoisE_args:list=["5", "2", "1", "-y"]):
         subprocess.check_call(DnoisE_call)
 
 
-denoise(data_dir="../../data/test_data")
+if __name__ == "__main__":
+    denoise(data_dir="../../data/test_data")

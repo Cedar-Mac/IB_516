@@ -46,4 +46,6 @@ def chimera_filter(data_dir:str, vsearch_args:list=["1.4", "8", "3", "1.2", "0.2
 
             subprocess.check_call(vsearch_chimera_call)
 
-chimera_filter(data_dir="../../data/test_data")
+
+if __name__ == "__main__":
+    chimera_filter(data_dir="../../data/test_data")

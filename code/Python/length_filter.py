@@ -47,4 +47,5 @@ def length_filter(data_dir:str, amplicon_length:int):
     log_file.close()
 
 
-length_filter(data_dir = "../../data/test_data", amplicon_length = 142)
+if __name__ == "__main__":
+    length_filter(data_dir = "../../data/test_data", amplicon_length = 142)
