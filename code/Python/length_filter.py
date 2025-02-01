@@ -19,15 +19,19 @@ def length_filter(data_dir:str, amplicon_length:int):
     if "length_filtered" in os.listdir(data_dir):
         shutil.rmtree(f"{data_dir}/length_filtered/")
 
-    if "length_filtered" not in os.listdir(data_dir):
-        os.makedirs(f"{data_dir}/length_filtered/")
+    # make output directory
+    os.makedirs(f"{data_dir}/length_filtered/")
+
+    # make log subdirectory
+    os.makedirs(f"{data_dir}/length_filtered/log")
+
 
     for data_file in os.listdir(f"{data_dir}/quality_filtered/"):
         if "fastq" in data_file:
             rm_counts = 0 # Keep track of removed lines (includes metadata lines at the moment)
             kepper_counts = 0 # Keep track of kept sequences
 
-            log_file = open(f"{data_dir}/length_filtered/length_filter.log", "a")
+            log_file = open(f"{data_dir}/length_filtered/log/length_filter.log", "a")
             in_file = open(f"{data_dir}/quality_filtered/{data_file}", "r")
             out_file = open(f"{data_dir}/length_filtered/{data_file[0:-len(fastq_suffix)]}.fasta", "a")
 

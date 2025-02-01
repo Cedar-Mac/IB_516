@@ -66,6 +66,9 @@ def trim_primers(data_dir: str, primer_option:int=1):
     # make output directory for trimmed files
     os.makedirs(f"{data_dir}/trimmed/")
 
+    # make log subdirectory
+    os.makedirs(f"{data_dir}/trimmed/logs")
+
     # cutadapt call to trim files in the "merged" subdirectory
     for file in os.listdir(f"{data_dir}/merged/"):
         if ".fastq" in file:
@@ -86,7 +89,12 @@ def trim_primers(data_dir: str, primer_option:int=1):
                          "--error-rate", "0.1",
                          f"{data_dir}/merged/{file}"]
         
-            subprocess.check_call(cutadapt_call)
+            with open(f"{data_dir}/trimmed/logs/{file[0:-len(merged_suffix)]}.log", "a") as log:
+                try:
+                    subprocess.run(cutadapt_call, stdout=log, stderr=log, check=True)
+                    print(f"\nProcessed {file} successfully.\n")
+                except subprocess.CalledProcessError as e:
+                    print(f"\nError processing {file}: {e}\n")
 
 
 if __name__ == "__main__":

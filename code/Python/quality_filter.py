@@ -17,6 +17,10 @@ def quality_filter(data_dir:str, vsearch_args:list=[1, 0]):
         - quality filtered reads in subfolder of data directory
     """
 
+    if len(vsearch_args) != 2:
+        print(f"quality_filter vsearch_args must be list of length two. {len(vsearch_args)} arguments were provided. Exiting.")
+        exit()
+
     trimmed_suffix = "_trimmed.fastq"
 
     # Remove old directory and files 
@@ -26,16 +30,24 @@ def quality_filter(data_dir:str, vsearch_args:list=[1, 0]):
     # Make directory for quality filtered reads
     os.makedirs(f"{data_dir}/quality_filtered/")
 
-    for data_file in os.listdir(f"{data_dir}/trimmed/"):
+    # Make subdirectory for logs
+    os.makedirs(f"{data_dir}/quality_filtered/logs/")
+
+    for file in os.listdir(f"{data_dir}/trimmed/"):
         # vsearch call for fastq filtering. See function description for arguments
-        if ".fastq" in data_file:
+        if ".fastq" in file:
             vsearch_ee_filter_call = ["vsearch",
-                                      "--fastx_filter", f"{data_dir}/trimmed/{data_file}",
-                                      "--fastqout", f"{data_dir}/quality_filtered/{data_file[0:-len(trimmed_suffix)]}.fastq",
+                                      "--fastx_filter", f"{data_dir}/trimmed/{file}",
+                                      "--fastqout", f"{data_dir}/quality_filtered/{file[0:-len(trimmed_suffix)]}.fastq",
                                       "--fastq_maxee", f"{vsearch_args[0]}",
                                       "--fastq_maxns", f"{vsearch_args[1]}"]
         
-        subprocess.check_call(vsearch_ee_filter_call)
+            with open(f"{data_dir}/quality_filtered/logs/{file[0:-len(trimmed_suffix)]}.log", "a") as log:
+                try:
+                    subprocess.run(vsearch_ee_filter_call, stdout=log, stderr=log, check=True)
+                    print(f"\nProcessed {file} successfully.\n")
+                except subprocess.CalledProcessError as e:
+                    print(f"\nError processing {file}: {e}\n")
 
 
 if __name__ == "__main__":

@@ -8,11 +8,11 @@ trim_primers.trim_primers(data_dir=path_to_data)
 
 length_filter.length_filter(data_dir=path_to_data, amplicon_length=142)
 
-quality_filter.quality_filter(data_dir=path_to_data)
-
 chimera_filter.chimera_filter(data_dir=path_to_data)
 
-frequency_filter.frequency_filter(data_dir=path_to_data)
+quality_filter.quality_filter(data_dir=path_to_data)
+
+frequency_filter.frequency_filter(data_dir=path_to_data, min_seq_count=3, min_site_occurance=3)
 
 #translation_filter()
 

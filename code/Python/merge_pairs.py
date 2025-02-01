@@ -25,6 +25,10 @@ def merge_pairs(data_dir:str, vsearch_args:list=["99", "16", "25", "--fastq_allo
         - Merged fastq files in merged directory within data directory.
     """
 
+    if len(vsearch_args) != 4:
+        print(f"merge_pairs vsearch_args must be list of length 4, {len(vsearch_args)} were provided. Exiting.")
+        exit()
+
     data_files = os.listdir(data_dir)
 
     fastq_suffix = "_RX.fastq"
@@ -50,7 +54,7 @@ def merge_pairs(data_dir:str, vsearch_args:list=["99", "16", "25", "--fastq_allo
 
     #Make output directory for logs
     if "logs" not in os.listdir(f"{data_dir}/merged/"):
-        os.makedirs(f"{data_dir}/../merge_logs/") 
+        os.makedirs(f"{data_dir}/merged/merge_logs/") 
 
     # Use VSEARCH fastq_mergepairs function
     for name in fwd_bare_names:
@@ -64,7 +68,12 @@ def merge_pairs(data_dir:str, vsearch_args:list=["99", "16", "25", "--fastq_allo
                                 "--fastq_maxdiffpct", f"{vsearch_args[2]}",
                                 f"{vsearch_args[3]}"]
 
-        subprocess.check_call(vsearch_merge_call)
+        with open(f"{data_dir}/merged/merge_logs/{name}.log", "a") as log:
+            try:
+                subprocess.run(vsearch_merge_call, stdout=log, stderr=log, check=True)
+                print(f"\nProcessed {name} successfully.\n")
+            except subprocess.CalledProcessError as e:
+                print(f"\nError processing {name}: {e}\n")
 
 
 if __name__ == "__main__":

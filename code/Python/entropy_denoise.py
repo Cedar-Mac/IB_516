@@ -18,12 +18,21 @@ def denoise(data_dir:str, DnoisE_args:list=["5", "2", "1", "-y"]):
         - Denoised fasta files in subdirectory plus csv INFO files.
     """
 
+    if (len(DnoisE_args) != 3) or (len(DnoisE_args) != 4):
+        print(f"denoise DnoisE_args must be list of length 3 or 4, length {len(DnoisE_args)} provided. Exiting.")
+        exit()
+        
+    fasta_suffix = ".fasta"
+
     # Remove old directory and files
     if "denoised" in os.listdir(data_dir):
         shutil.rmtree(f"{data_dir}/denoised/")
 
-    # make output directory for merged files
+    # make output directory for denoised files
     os.makedirs(f"{data_dir}/denoised/")
+
+    # make log subdirectory
+    os.makedirs(f"{data_dir}/denoised/logs/")
 
     for file in os.listdir(f"{data_dir}/freq_filtered/"):
         if len(DnoisE_args) == 4: # With -y flag
@@ -43,7 +52,12 @@ def denoise(data_dir:str, DnoisE_args:list=["5", "2", "1", "-y"]):
                             "-x", f"{DnoisE_args[1]}",
                             "--min_abund", f"{DnoisE_args[2]}"]
 
-        subprocess.check_call(DnoisE_call)
+            with open(f"{data_dir}/denoised/logs/{file[0:-len(fasta_suffix)]}.log", "a") as log:
+                try:
+                    subprocess.run(DnoisE_call, stdout=log, stderr=log, check=True)
+                    print(f"\nProcessed {file} successfully.\n")
+                except subprocess.CalledProcessError as e:
+                    print(f"\nError processing {file}: {e}\n")
 
 
 if __name__ == "__main__":

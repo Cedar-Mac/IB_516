@@ -25,6 +25,12 @@ def chimera_filter(data_dir:str, vsearch_args:list=["1.4", "8", "3", "1.2", "0.2
         - Chimera filtered subfolder in data directory.
     """
 
+    if len(vsearch_args) != 5:
+        print(f"chimera_filter vsearch_args must be list of length 5, {len(vsearch_args)} were provided. Exiting.")
+        exit()
+
+    fasta_suffix = ".fasta"
+
     # Remove old directory and files 
     if "chimera_filtered" in os.listdir(data_dir):
         shutil.rmtree(f"{data_dir}/chimera_filtered/")
@@ -32,19 +38,25 @@ def chimera_filter(data_dir:str, vsearch_args:list=["1.4", "8", "3", "1.2", "0.2
     # Make directory for quality filtered reads
     os.makedirs(f"{data_dir}/chimera_filtered/")
 
+    os.makedirs(f"{data_dir}/chimera_filtered/logs")
+
     for file in os.listdir(f"{data_dir}/length_filtered/"):
         if "fasta" in file:
             vsearch_chimera_call = ["vsearch",
                                  "--uchime_denovo", f"{data_dir}/length_filtered/{file}",
                                  "--nonchimeras", f"{data_dir}/chimera_filtered/{file}",
                                  "--dn", f"{vsearch_args[0]}",
-                                 "--xn", f"{vsearch_args[1]}"
+                                 "--xn", f"{vsearch_args[1]}",
                                  "--mindiffs", f"{vsearch_args[2]}",
                                  "--mindiv", f"{vsearch_args[3]}",
-                                 "--minh", f"{vsearch_args[4]}"
-                                 ]
+                                 "--minh", f"{vsearch_args[4]}"]
 
-            subprocess.check_call(vsearch_chimera_call)
+            with open(f"{data_dir}/chimera_filtered/logs/{file[0:-len(fasta_suffix)]}.log", "a") as log:
+                try:
+                    subprocess.run(vsearch_chimera_call, stdout=log, stderr=log, check=True)
+                    print(f"\nProcessed {file} successfully.\n")
+                except subprocess.CalledProcessError as e:
+                    print(f"\nError processing {file}: {e}\n")
 
 
 if __name__ == "__main__":
