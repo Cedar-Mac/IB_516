@@ -83,7 +83,7 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
 
                 for count, seq in zip(f, f):
                     if (site_occurances[seq] >= min_site_occurance) or (int(count) >= min_seq_count):
-                        out_file.write(f">{tmp_file[0:-len(fasta_suffix)]}_{i}; size:{count}")
+                        out_file.write(f">id={tmp_file[0:-len(fasta_suffix)]}_{i}; size={count.rstrip()};\n")
                         out_file.write(seq)
                         i += 1
                     else:
