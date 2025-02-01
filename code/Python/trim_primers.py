@@ -3,23 +3,23 @@ import os, subprocess, shutil
 def trim_primers(data_dir: str, primer_option:int=1):
     """
     Inputs:
-        data_dir: String specifying data directory
-        primer_option: Integer specifying the primer set to use
-            1 = invertebrate COI
-            Anything else: not supported yet
+        - data_dir: String specifying data directory
+        - primer_option: Integer specifying the primer set to use
+            - 1 = invertebrate COI
+            - Anything else: not supported yet
         
     cutadapt arguments:
-        -g: The 5' primer sequence. I anchor the fwd primer with ^
-        -a: The 3' primer sequence. Not anchored
-        --discard_untrimmed: Get rid of sequences with no matching primer
-        -n: Number of times to repeat. Cutadapt only removes one primer at a time.
+        - [0] -g: The 5' primer sequence. I anchor the fwd primer with ^
+        - [1] -a: The 3' primer sequence. Not anchored
+        - [2] --discard_untrimmed: Get rid of sequences with no matching primer
+        - [3] -n: Number of times to repeat. Cutadapt only removes one primer at a time.
             Repeat twice to remove fwd and rvs primers.
-        -o: output file
-        --error-rate: What fraction of bases can not match the primer sequence.
+        - [4] -o: output file
+        - [5] --error-rate: What fraction of bases can not match the primer sequence.
                         Set to 0.1 in line with JAMP.
     
     Outputs:
-        Trimmed sequences output in sub-folder of data directory in fastq format.
+        - Trimmed sequences output in sub-folder of data directory in fastq format.
     """
 
     # Complementary base pairings for making the reverse complement of a primer sequence.

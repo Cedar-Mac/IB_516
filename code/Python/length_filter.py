@@ -6,11 +6,13 @@ fastq_suffix = ".fastq"
 def length_filter(data_dir:str, amplicon_length:int):
     """
     Filter sequences to match amplicon length.
+
     Inputs:
-        data_dir: path to data directory as a string
-        amplicon_length: fixed length of amplicon sequence.
+        - data_dir: path to data directory as a string
+        - amplicon_length: fixed length of amplicon sequence.
+
     Outputs:
-        Trimmed sequences as fasta files in subfolder of data directory
+        - Trimmed sequences as fasta files in subfolder of data directory
     """
 
     # Remove old files and make output directory for length-filtered files
@@ -33,10 +35,10 @@ def length_filter(data_dir:str, amplicon_length:int):
 
             # Iterate over pairs of lines.
             for i, pair in enumerate(pairwise(lines)):
-                if (i % 4 == 0) and (len(pair[1]) == amplicon_length): # if current line is a header and next line is a keeper sequence
+                if (i % 4 == 0) and (len(pair[1].rstrip()) == amplicon_length): # if current line is a header and next line is a keeper sequence
                     out_file.write(f">{pair[0]}") # write header line
                 if i % 4 == 1:
-                    if len(pair[0]) == amplicon_length: # if current line is a keeper sequence
+                    if len(pair[0].rstrip()) == amplicon_length: # if current line is a keeper sequence
                         out_file.write(f"{pair[0]}") # write keeper sequence
                         kepper_counts += 1
                     if len(pair[0]) != 142: # sequence was not correct length, keep track of skipped sequences.

@@ -7,14 +7,14 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
     Filter sequences based on their frequency of occurances within and between sites.
 
     Input:
-        data_dir: string with path to data directory
-        min_seq_count: Integer, minimum sequence occurance at a site
-        min_site_occurance: minimum number of sites a low abundance sequence
+        - data_dir: string with path to data directory
+        - min_seq_count: Integer, minimum sequence occurance at a site
+        - min_site_occurance: minimum number of sites a low abundance sequence
                             must occur at to be retained.
 
     Output: 
-        fasta files with size (seq count) in header in freq_filtered subdirectory.
-        Formated for input into DnoisE filtering algorithm.
+        - fasta files with size (seq count) in header in freq_filtered subdirectory.
+        - Formated for input into DnoisE filtering algorithm.
 
     Details:
         A sequence occurance at a site is only dropped if two conditions are met:

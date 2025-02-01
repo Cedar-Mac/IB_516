@@ -6,23 +6,23 @@ def merge_pairs(data_dir:str, vsearch_args:list=["99", "16", "25", "--fastq_allo
 
     Input:
 
-        data_dir: string providing the path to the data directory with raw input fastq files.
+        - data_dir: string providing the path to the data directory with raw input fastq files.
 
     vsearch arguments:
 
-        --fastq_mergepairs: specify the maximum number of non-matching nucleotides 
+        - [0] --fastq_mergepairs: specify the maximum number of non-matching nucleotides 
                             allowed in the overlap region. That option has a strong 
                             influence on the merging success rate. Set to 99 a la JAMP.
-        --fastq_minovlen: Minimum overlap between paired sequences to merge. JAMP default is 16,
+        - [1] --fastq_minovlen: Minimum overlap between paired sequences to merge. JAMP default is 16,
                             base default is 10. Currently set to JAMP default.
-        --fastq_diffpct: Maximum allowed percent difference between the two paired sequences. 
+        - [2] --fastq_diffpct: Maximum allowed percent difference between the two paired sequences. 
                             vsearch recommended default is 100%, JAMP sets the default to 25%
                             I'm using the JAMP default.
-        --fastq_allowmergestagger: Allows for reads to be staggered, this is following JAMP convention.
+        - [3] --fastq_allowmergestagger: Allows for reads to be staggered, this is following JAMP convention.
 
     Output:
 
-        Merged fastq files in merged directory within data directory.
+        - Merged fastq files in merged directory within data directory.
     """
 
     data_files = os.listdir(data_dir)

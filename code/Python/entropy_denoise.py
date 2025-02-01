@@ -6,14 +6,16 @@ def denoise(data_dir:str, DnoisE_args:list=["5", "2", "1", "-y"]):
     Denoise using Antich's DnoisE algorithm.
 
     Inputs:
-        data_dir: string with path to data directory.
+        - data_dir: string with path to data directory.
 
     DnoisE_args:
-        --alpha: alpha value
-        -x:
-        --min_abund:
-        -y: Use entropy? -y for yes, otherwise no flag.
+        - [0] --alpha: alpha value
+        - [1] -x:
+        - [2] --min_abund:
+        - [3] -y: Use entropy? -y for yes, otherwise no flag.
 
+    Outputs:
+        - Denoised fasta files in subdirectory plus csv INFO files.
     """
 
     # Remove old directory and files

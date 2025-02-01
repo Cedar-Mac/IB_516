@@ -5,16 +5,16 @@ def quality_filter(data_dir:str, vsearch_args:list=[1, 0]):
     Filter fastq filters that have already been trimmed.
 
     Input:
-        data_dir: String with main data directory
+        - data_dir: String with main data directory
 
     vsearch_args:
-        [0] --fastq_maxee: Max expected cummulative error.
+        - [0] --fastq_maxee: Max expected cummulative error.
                             Set to 1 (probability of single error = )
-        [1] --fastq_maxns: Number of allowed N's in the sequence.
+        - [1] --fastq_maxns: Number of allowed N's in the sequence.
                             Set to 0
 
     Output:
-        quality filtered reads in subfolder of data directory
+        - quality filtered reads in subfolder of data directory
     """
 
     trimmed_suffix = "_trimmed.fastq"
