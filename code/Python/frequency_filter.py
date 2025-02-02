@@ -41,21 +41,29 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
 
     # make temp directory for sorted counts
     os.makedirs(f"{data_dir}/freq_filtered/temp/")
+    os.makedirs(f"{data_dir}/freq_filtered/fixed_infiles/")
 
     too_few_list = []
 
     for file in os.listdir(f"{data_dir}/chimera_filtered/"):
 
         if "fasta" in file:
-            # open files
-            in_file = open(f"{data_dir}/chimera_filtered/{file}", "r")
+            # Sequence getting split over two lines. Make sequences whole.
+            with open(f"{data_dir}/chimera_filtered/{file}", "r") as infile, open(f"{data_dir}/freq_filtered/fixed_infiles/{file}", "w") as outfile:
+                for line in infile:
+                    if line.startswith(">"):
+                        outfile.write(f"\n{line}")
+                    else:
+                        outfile.write(line.strip())
+
             temp_file = open(f"{data_dir}/freq_filtered/temp/{file}", "a")
+            in_file = open(f"{data_dir}/freq_filtered/fixed_infiles/{file}", "r")
 
             # Read lines in file into list
             lines = in_file.readlines()
 
             # Count occurance of sequences
-            seq_counts = Counter(lines[1::2])
+            seq_counts = Counter(lines[2::2]) # my fasta file fix introduces an empty first line
 
             for key in seq_counts:
                 if seq_counts[key] < min_seq_count:
@@ -74,6 +82,7 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
     # From these limited sequences, find ones that only occur at a minimum number of sites.
     site_occurances = Counter(too_few_list)
 
+    # Track sequence index
     i = 1
 
     for tmp_file in os.listdir(f"{data_dir}/freq_filtered/temp/"):
@@ -90,15 +99,18 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
                         out_file.write(seq)
                         i += 1
                     else:
-                        log_file.write(f"{seq} occured less than {min_seq_count} times at {tmp_file[0:-len(fasta_suffix)]} and was present at {site_occurances[seq] - 1} other sites.\n")
+                        log_file.write(f"{seq} occured less than {min_seq_count} times at {tmp_file[0:-len(fasta_suffix)]} and present at {site_occurances[seq] - 1} other sites.\n")
 
                 out_file.close()
     log_file.close()
 
 
-    # Remove temp directory and files
+    # Remove temp directories and files
     if "temp" in os.listdir(f"{data_dir}/freq_filtered"):
         shutil.rmtree(f"{data_dir}/freq_filtered/temp/")
+
+    if "fixed" in os.listdir(f"{data_dir}/freq_filtered"):
+        shutil.rmtree(f"{data_dir}/freq_filtered/fixed_infiles/") 
 
 
 if __name__ == "__main__":
