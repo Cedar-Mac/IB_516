@@ -455,7 +455,7 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
 
 
 ###### DENOISE ######
-def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "2", "1", "10", "122", "-y"]):
+def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "2", "1", "10", "-y"]):
     """
     Denoise using Antich's DnoisE algorithm.
 
@@ -468,15 +468,14 @@ def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "2"
         - [2] -x:
         - [3] --min_abund:
         - [4] --cores: 
-        - [5] --modal_length:
-        - [6] -y: Use entropy? -y for yes, otherwise no flag.
+        - [5] -y: Use entropy? -y for yes, otherwise no flag.
 
     Outputs:
         - Denoised fasta files in subdirectory plus csv INFO files.
     """
 
-    if (len(DnoisE_args) < 6) or (len(DnoisE_args) > 7):
-        print(f"denoise DnoisE_args must be list of length 3 or 4, length {len(DnoisE_args)} provided. Exiting.")
+    if (len(DnoisE_args) < 5) or (len(DnoisE_args) > 6):
+        print(f"denoise DnoisE_args must be list of length 5 or 6, length {len(DnoisE_args)} provided. Exiting.")
         exit()
 
     fasta_suffix = ".fasta"
@@ -501,7 +500,6 @@ def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "2"
                             "-x", str(DnoisE_args[2]),
                             "--min_abund", str(DnoisE_args[3]),
                             "-c", str(DnoisE_args[4]),
-                            "-m", str(DnoisE_args[5]),
                             "-y"]
             
         if len(DnoisE_args) == 6: # No -y flag
@@ -512,8 +510,7 @@ def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "2"
                             "--alpha", str(DnoisE_args[1]),
                             "-x", str(DnoisE_args[2]),
                             "--min_abund", str(DnoisE_args[3]),
-                            "-c", str(DnoisE_args[4]),
-                            "-m", str(DnoisE_args[5])]
+                            "-c", str(DnoisE_args[4])]
 
         if ".fasta" in file:
             with open(f"{data_dir}/{output_dir}/logs/{file[0:-len(fasta_suffix)]}.log", "a") as log:

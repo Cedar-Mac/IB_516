@@ -21,10 +21,10 @@ for option in ["ent", "no_ent"]:
     for alpha in [1, 3, 5, 7, 9, 11, 13]:
 
         if option == "ent":
-            denoise_args = [str(alpha), "2", "1", "-y"]
+            denoise_args = ["1", str(alpha), "2", "1", "10", "-y"]
 
         if option == "no_ent":
-            denoise_args = [str(alpha), "2", "1"]
+            denoise_args = ["1", str(alpha), "2", "1", "10"]
 
         pipeline.denoise(data_dir=path_to_data, output_dir=f"{option}_alpha_{alpha}_denoised", DnoisE_args=denoise_args)
 
