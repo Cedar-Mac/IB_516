@@ -1,0 +1,1 @@
+# Calculate average entropy ratio for denoising method (average across all sites).

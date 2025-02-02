@@ -80,10 +80,6 @@ def merge_pairs(data_dir:str, vsearch_args:list=["99", "16", "25", "--fastq_allo
                 print(f"\nError processing {name}: {e}\n")
 
 
-if __name__ == "__main__":
-    merge_pairs("../../data/test_data")
-
-
 ###### TRIM ######
 def trim_primers(data_dir: str, primer_option:int=1):
     """
@@ -182,10 +178,6 @@ def trim_primers(data_dir: str, primer_option:int=1):
                     print(f"\nError processing {file}: {e}\n")
 
 
-if __name__ == "__main__":
-    trim_primers(data_dir="../../data/test_data")
-
-
 ###### QUAL. FILTER ######
 def quality_filter(data_dir:str, vsearch_args:list=[1, 0]):
     """
@@ -235,10 +227,6 @@ def quality_filter(data_dir:str, vsearch_args:list=[1, 0]):
                     print(f"\nQuality filtered {file} successfully.\n")
                 except subprocess.CalledProcessError as e:
                     print(f"\nError processing {file}: {e}\n")
-
-
-if __name__ == "__main__":
-    quality_filter(data_dir="../../data/test_data")
 
 
 ###### LENGTH FILTER ######
@@ -292,10 +280,6 @@ def length_filter(data_dir:str, amplicon_length:int):
             in_file.close()
             log_file.write(f"{data_file} had {rm_counts} sequences removed and {kepper_counts} sequences were kept.\n\n")
     log_file.close()
-
-
-if __name__ == "__main__":
-    length_filter(data_dir = "../../data/test_data", amplicon_length = 142)
 
 
 ###### CHIMERA FILTER ######
@@ -356,10 +340,6 @@ def chimera_filter(data_dir:str, vsearch_args:list=["1.4", "8", "3", "1.2", "0.2
                     print(f"\nChimera filtered {file} successfully.\n")
                 except subprocess.CalledProcessError as e:
                     print(f"\nError processing {file}: {e}\n")
-
-
-if __name__ == "__main__":
-    chimera_filter(data_dir="../../data/test_data")
 
 
 ###### FREQ. FILTER ######
@@ -462,12 +442,8 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
         shutil.rmtree(f"{data_dir}/freq_filtered/temp/")
 
 
-if __name__ == "__main__":
-    frequency_filter("../../data/test_data", min_seq_count=3, min_site_occurance=3)
-
-
 ###### DENOISE ######
-def denoise(data_dir:str, DnoisE_args:list=["5", "2", "1", "-y"]):
+def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "2", "1", "10", "122", "-y"]):
     """
     Denoise using Antich's DnoisE algorithm.
 
@@ -475,16 +451,19 @@ def denoise(data_dir:str, DnoisE_args:list=["5", "2", "1", "-y"]):
         - data_dir: string with path to data directory.
 
     DnoisE_args:
-        - [0] --alpha: alpha value
-        - [1] -x:
-        - [2] --min_abund:
-        - [3] -y: Use entropy? -y for yes, otherwise no flag.
+        - [0] --joining_criteria:
+        - [1] --alpha: alpha value
+        - [2] -x:
+        - [3] --min_abund:
+        - [4] --cores: 
+        - [5] --modal_length:
+        - [6] -y: Use entropy? -y for yes, otherwise no flag.
 
     Outputs:
         - Denoised fasta files in subdirectory plus csv INFO files.
     """
 
-    if (len(DnoisE_args) < 3) or (len(DnoisE_args) < 4):
+    if (len(DnoisE_args) < 6) or (len(DnoisE_args) > 7):
         print(f"denoise DnoisE_args must be list of length 3 or 4, length {len(DnoisE_args)} provided. Exiting.")
         exit()
 
@@ -492,40 +471,42 @@ def denoise(data_dir:str, DnoisE_args:list=["5", "2", "1", "-y"]):
 
     # Remove old directory and files
     if "denoised" in os.listdir(data_dir):
-        shutil.rmtree(f"{data_dir}/denoised/")
+        shutil.rmtree(f"{data_dir}/{output_dir}/")
 
     # make output directory for denoised files
-    os.makedirs(f"{data_dir}/denoised/")
+    os.makedirs(f"{data_dir}/{output_dir}/")
 
     # make log subdirectory
-    os.makedirs(f"{data_dir}/denoised/logs/")
+    os.makedirs(f"{data_dir}/{output_dir}/logs/")
 
     for file in os.listdir(f"{data_dir}/freq_filtered/"):
-        if len(DnoisE_args) == 4: # With -y flag
+        if len(DnoisE_args) == 7: # With -y flag
             DnoisE_call = ["dnoise", 
                             "--fasta_input", f"{data_dir}/freq_filtered/{file}",
-                            "--fasta_output", f"{data_dir}/denoised/{file}",
-                            "--alpha", f"{DnoisE_args[0]}",
-                            "-x", f"{DnoisE_args[1]}",
-                            "--min_abund", f"{DnoisE_args[2]}",
+                            "--fasta_output", f"{data_dir}/{output_dir}/{file}",
+                            "-j", str(DnoisE_args[0]),
+                            "--alpha", str(DnoisE_args[1]),
+                            "-x", str(DnoisE_args[2]),
+                            "--min_abund", str(DnoisE_args[3]),
+                            "-c", str(DnoisE_args[4]),
+                            "-m", str(DnoisE_args[5]),
                             "-y"]
             
-        if len(DnoisE_args) == 3: # No -y flag
+        if len(DnoisE_args) == 6: # No -y flag
             DnoisE_call = ["dnoise", 
                             "--fasta_input", f"{data_dir}/freq_filtered/{file}",
-                            "--fasta_output", f"{data_dir}/denoised/{file}",
-                            "--alpha", f"{DnoisE_args[0]}",
-                            "-x", f"{DnoisE_args[1]}",
-                            "--min_abund", f"{DnoisE_args[2]}"]
+                            "--fasta_output", f"{data_dir}/{output_dir}/{file}",
+                            "--j", str(DnoisE_args[0]),
+                            "--alpha", str(DnoisE_args[1]),
+                            "-x", str(DnoisE_args[2]),
+                            "--min_abund", str(DnoisE_args[3]),
+                            "-c", str(DnoisE_args[4]),
+                            "-m", str(DnoisE_args[5])]
 
         if ".fasta" in file:
-            with open(f"{data_dir}/denoised/logs/{file[0:-len(fasta_suffix)]}.log", "a") as log:
+            with open(f"{data_dir}/{output_dir}/logs/{file[0:-len(fasta_suffix)]}.log", "a") as log:
                 try:
                     subprocess.run(DnoisE_call, stdout=log, stderr=log, check=True)
                     print(f"\nDenoised {file} successfully.\n")
                 except subprocess.CalledProcessError as e:
                     print(f"\nError processing {file}: {e}\n")
-
-
-if __name__ == "__main__":
-    denoise(data_dir="../../data/test_data")
