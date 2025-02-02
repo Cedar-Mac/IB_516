@@ -18,13 +18,14 @@ if "freq_filtered" not in os.listdir(path_to_data):
 
 # Run through combinations of denoising parameters
 for option in ["ent", "no_ent"]:
+    
     for alpha in [1, 3, 5, 7, 9, 11, 13]:
 
         if option == "ent":
-            denoise_args = ["1", str(alpha), "2", "1", "10", "-y"]
+            args = ["1", str(alpha), "3", "1", "1", "-y"]
 
         if option == "no_ent":
-            denoise_args = ["1", str(alpha), "2", "1", "10"]
+            args = ["1", str(alpha), "3", "1", "1"]
 
-        pipeline.denoise(data_dir=path_to_data, output_dir=f"{option}_alpha_{alpha}_denoised", DnoisE_args=denoise_args)
+        pipeline.denoise(data_dir=path_to_data, output_dir=f"benchmarking/{option}_alpha_{alpha}_denoised", DnoisE_args=args)
 

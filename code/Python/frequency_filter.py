@@ -82,10 +82,10 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
     # From these limited sequences, find ones that only occur at a minimum number of sites.
     site_occurances = Counter(too_few_list)
 
-    # Track sequence index
-    i = 1
 
     for tmp_file in os.listdir(f"{data_dir}/freq_filtered/temp/"):
+        # Track sequence index
+        i = 1
         
         if "fasta" in tmp_file:
 

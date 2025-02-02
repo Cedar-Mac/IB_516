@@ -423,10 +423,10 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
     # From these limited sequences, find ones that only occur at a minimum number of sites.
     site_occurances = Counter(too_few_list)
 
-    # Track sequence index
-    i = 1
 
     for tmp_file in os.listdir(f"{data_dir}/freq_filtered/temp/"):
+        # Track sequence index
+        i = 1
         
         if "fasta" in tmp_file:
 
@@ -455,7 +455,7 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
 
 
 ###### DENOISE ######
-def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "2", "1", "10", "-y"]):
+def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "3", "1", "1", "-y"]):
     """
     Denoise using Antich's DnoisE algorithm.
 
@@ -491,7 +491,7 @@ def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "2"
     os.makedirs(f"{data_dir}/{output_dir}/logs/")
 
     for file in os.listdir(f"{data_dir}/freq_filtered/"):
-        if len(DnoisE_args) == 7: # With -y flag
+        if len(DnoisE_args) == 6: # With -y flag
             DnoisE_call = ["dnoise", 
                             "--fasta_input", f"{data_dir}/freq_filtered/{file}",
                             "--fasta_output", f"{data_dir}/{output_dir}/{file}",
@@ -502,11 +502,11 @@ def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "2"
                             "-c", str(DnoisE_args[4]),
                             "-y"]
             
-        if len(DnoisE_args) == 6: # No -y flag
+        if len(DnoisE_args) == 5: # No -y flag
             DnoisE_call = ["dnoise", 
                             "--fasta_input", f"{data_dir}/freq_filtered/{file}",
                             "--fasta_output", f"{data_dir}/{output_dir}/{file}",
-                            "--j", str(DnoisE_args[0]),
+                            "-j", str(DnoisE_args[0]),
                             "--alpha", str(DnoisE_args[1]),
                             "-x", str(DnoisE_args[2]),
                             "--min_abund", str(DnoisE_args[3]),
