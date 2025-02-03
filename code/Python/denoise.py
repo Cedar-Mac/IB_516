@@ -37,7 +37,7 @@ def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "3"
     os.makedirs(f"{data_dir}/{output_dir}/logs/")
 
     for file in os.listdir(f"{data_dir}/freq_filtered/"):
-        if len(DnoisE_args) == 6: # With -y flag
+        if "-y" in DnoisE_args: # With -y flag
             DnoisE_call = ["dnoise", 
                             "--fasta_input", f"{data_dir}/freq_filtered/{file}",
                             "--fasta_output", f"{data_dir}/{output_dir}/{file}",
@@ -48,7 +48,7 @@ def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "3"
                             "-c", str(DnoisE_args[4]),
                             "-y"]
             
-        if len(DnoisE_args) == 5: # No -y flag
+        if "-y" not in DnoisE_args: # No -y flag
             DnoisE_call = ["dnoise", 
                             "--fasta_input", f"{data_dir}/freq_filtered/{file}",
                             "--fasta_output", f"{data_dir}/{output_dir}/{file}",
