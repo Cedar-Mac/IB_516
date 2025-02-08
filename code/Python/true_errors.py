@@ -160,9 +160,10 @@ def get_conserved_base_positions(data_dir:str, fully_aligned_file:str):
     codon_2 = [codon_2_start, codon_2_start + 1, codon_2_start + 2]
     codon_3 = [codon_3_start, codon_3_start + 1, codon_3_start + 2]
 
+    print(codon_1, codon_2, codon_3)
     return codon_1, codon_2, codon_3
 
-def check_seqs(data_dir, fasta, c_1, c_2, c_3):
+def check_seqs(data_dir, fasta, codon_1, codon_2, codon_3):
     codon_dict = {"H": ["CAC", "CAT"], "G": ["GGA", "GGT", "GGC", "GGG"], "N": ["AAC", "AAT"]}
     stop_seqs = ["TAA", "TGA", "TAG"]
 
@@ -174,9 +175,9 @@ def check_seqs(data_dir, fasta, c_1, c_2, c_3):
             if ">" not in rawline:
                 # Two N's added to match reading frame
                 seq = "NN" + rawline.rstrip()
-                first_codon = "".join([seq[i] for i in c_1])
-                second_codon = "".join([seq[i] for i in c_2])
-                third_codon = "".join([seq[i] for i in c_3])
+                first_codon = "".join([seq[i] for i in codon_1])
+                second_codon = "".join([seq[i] for i in codon_2])
+                third_codon = "".join([seq[i] for i in codon_3])
 
                 if ((first_codon != codon_dict["H"][0]) and 
                     (first_codon != codon_dict["H"][1])):
@@ -197,7 +198,10 @@ def check_seqs(data_dir, fasta, c_1, c_2, c_3):
                         codon == stop_seqs[1] or 
                         codon == stop_seqs[2]):
                         num_errors += 1
-        print(num_errors/num_seqs)
+
+        error_rate = num_errors / num_seqs
+
+        return error_rate
 
 
 if __name__ == "__main__":
@@ -207,13 +211,17 @@ if __name__ == "__main__":
     ref_aligned = "coi_aligned.fasta"
     fully_aligned = "bug_aligned_coi.fasta"
 
-    align_ref_sequences(data_dir = data, in_file = "coi_fixed.fasta", outfile = ref_aligned)
-    conserved_aas =  get_conserved_aas(data_dir="../../data/alignments", ref_file = ref_aligned)
+    align_ref_sequences(data_dir = data, in_file = ref_file, outfile = ref_aligned)
+    conserved_aas =  get_conserved_aas(data_dir = data, ref_file = ref_aligned)
 
-    align_amplicon(data_dir = "../../data/alignments", 
+    align_amplicon(data_dir = data, 
                    ex_file = "coi_bug.fasta", 
                    aligned_file = ref_aligned,
                    fully_aligned_file = fully_aligned)
     
     c_1, c_2, c_3 = get_conserved_base_positions("../../data/alignments", fully_aligned_file = fully_aligned)
-    check_seqs(data_dir="../../data/test_data/benchmarking/ent_alpha_1_denoised", fasta="BA_1_S92.fasta", c_1=c_1, c_2=c_2, c_3=c_3)
+    #error_rate = check_seqs(data_dir="../../data/test_data/benchmarking/ent_alpha_1_denoised", 
+    #           fasta = "BA_1_S92.fasta", 
+    #           codon_1=c_1, 
+    #           codon_2=c_2, 
+    #           codon_3=c_3)
