@@ -33,7 +33,7 @@ def merge_pairs(data_dir:str, vsearch_args:list=["99", "16", "25", "--fastq_allo
         print(f"merge_pairs vsearch_args must be list of length 4, {len(vsearch_args)} were provided. Exiting.")
         exit()
 
-    data_files = os.listdir(data_dir)
+    data_files = os.listdir(f"{data_dir}/input")
 
     fastq_suffix = "_RX.fastq"
 
@@ -455,7 +455,7 @@ def frequency_filter(data_dir:str, min_seq_count:int, min_site_occurance:int):
 
 
 ###### DENOISE ######
-def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "3", "1", "1", "-y"]):
+def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "3", "1", "1", "-y", "4"]):
     """
     Denoise using Antich's DnoisE algorithm.
 
@@ -468,13 +468,14 @@ def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "3"
         - [2] --min_abund:
         - [3] --cores: 
         - [4] -y: Use entropy? -y for yes, otherwise no flag.
+        - [5] --joining: method of joing daughter to mother ()
 
     Outputs:
         - Denoised fasta files in subdirectory plus csv INFO files.
     """
 
-    if (len(DnoisE_args) < 4) or (len(DnoisE_args) > 5):
-        print(f"denoise DnoisE_args must be list of length 4 or 5, length {len(DnoisE_args)} provided. Exiting.")
+    if (len(DnoisE_args) < 5) or (len(DnoisE_args) > 6):
+        print(f"denoise DnoisE_args must be list of length 5 or 6, length {len(DnoisE_args)} provided. Exiting.")
         exit()
 
     fasta_suffix = ".fasta"
@@ -490,24 +491,26 @@ def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "3"
     os.makedirs(f"{data_dir}/{output_dir}/logs/")
 
     for file in os.listdir(f"{data_dir}/freq_filtered/"):
-        if len(DnoisE_args) == 5: # With -y flag
+        if len(DnoisE_args) == 6: # With -y flag
             DnoisE_call = ["dnoise", 
                             "--fasta_input", f"{data_dir}/freq_filtered/{file}",
                             "--fasta_output", f"{data_dir}/{output_dir}/{file}",
                             "--alpha", str(DnoisE_args[0]),
                             "-x", str(DnoisE_args[1]),
                             "--min_abund", str(DnoisE_args[2]),
-                            "-c", str(DnoisE_args[0]),
-                            "-y"]
+                            "-c", str(DnoisE_args[3]),
+                            "-y",
+                            "--joining_criteria", str(DnoisE_args[5])]
             
-        if len(DnoisE_args) == 4: # No -y flag
+        if len(DnoisE_args) == 5: # No -y flag
             DnoisE_call = ["dnoise", 
                             "--fasta_input", f"{data_dir}/freq_filtered/{file}",
                             "--fasta_output", f"{data_dir}/{output_dir}/{file}",
                             "--alpha", str(DnoisE_args[1]),
                             "-x", str(DnoisE_args[1]),
                             "--min_abund", str(DnoisE_args[2]),
-                            "-c", str(DnoisE_args[3])]
+                            "-c", str(DnoisE_args[3]),
+                            "--joining_criteria", str(DnoisE_args[4])]
 
         if ".fasta" in file:
             with open(f"{data_dir}/{output_dir}/logs/{file[0:-len(fasta_suffix)]}.log", "a") as log:

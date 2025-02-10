@@ -163,7 +163,23 @@ def get_conserved_base_positions(data_dir:str, fully_aligned_file:str):
     print(codon_1, codon_2, codon_3)
     return codon_1, codon_2, codon_3
 
-def check_seqs(data_dir, fasta, codon_1, codon_2, codon_3):
+
+def check_seqs(data_dir:str, fasta:str, codon_1:list, codon_2:list, codon_3:list)->list:
+    """
+    Get number of errors and total sequences in a fasta file.
+
+    Inputs:
+        - data_dir: path to directory
+        - fasta: Name of fasta (no path)
+        - codon_1, 2, & 3: Lists of three base positions of each codon.
+
+    Outputs:
+        - List containing: 
+            [0]: num_errors
+            [1]: num_seqs
+            [2]: error_rate
+    """
+
     codon_dict = {"H": ["CAC", "CAT"], "G": ["GGA", "GGT", "GGC", "GGG"], "N": ["AAC", "AAT"]}
     stop_seqs = ["TAA", "TGA", "TAG"]
 
@@ -201,7 +217,7 @@ def check_seqs(data_dir, fasta, codon_1, codon_2, codon_3):
 
         error_rate = num_errors / num_seqs
 
-        return error_rate
+        return [num_errors, num_seqs, error_rate]
 
 
 if __name__ == "__main__":
@@ -220,8 +236,8 @@ if __name__ == "__main__":
                    fully_aligned_file = fully_aligned)
     
     c_1, c_2, c_3 = get_conserved_base_positions("../../data/alignments", fully_aligned_file = fully_aligned)
-    #error_rate = check_seqs(data_dir="../../data/test_data/benchmarking/ent_alpha_1_denoised", 
-    #           fasta = "BA_1_S92.fasta", 
-    #           codon_1=c_1, 
-    #           codon_2=c_2, 
-    #           codon_3=c_3)
+    error_rate = check_seqs(data_dir="../../data/test_data/benchmarking/ent_alpha_1_denoised", 
+               fasta = "BA_1_S92.fasta", 
+               codon_1=c_1, 
+               codon_2=c_2, 
+               codon_3=c_3)
