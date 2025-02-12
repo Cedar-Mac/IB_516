@@ -1,6 +1,7 @@
 import subprocess, os
 from Bio import AlignIO
 from Bio.Seq import Seq
+import matplotlib.pyplot as plt
 
 # Got amino acid sequences from supplementary materials of
 # Pentinsaari paper "Molecular evolution of a widely-adopted 
@@ -160,7 +161,6 @@ def get_conserved_base_positions(data_dir:str, fully_aligned_file:str):
     codon_2 = [codon_2_start, codon_2_start + 1, codon_2_start + 2]
     codon_3 = [codon_3_start, codon_3_start + 1, codon_3_start + 2]
 
-    print(codon_1, codon_2, codon_3)
     return codon_1, codon_2, codon_3
 
 
@@ -218,26 +218,75 @@ def check_seqs(data_dir:str, fasta:str, codon_1:list, codon_2:list, codon_3:list
         error_rate = num_errors / num_seqs
 
         return [num_errors, num_seqs, error_rate]
+    
+def get_method_avgs(denoised_dir, method, o, a, c1, c2, c3):
+    method_stats = []
+    file_suffix = ".fasta_Adcorr_denoised_d.fasta"
+    for file in os.listdir(f"{denoised_dir}/{o}_alpha_{a}_denoised"):
 
+        if f"denoised_{method}.fasta" in file:
+            file_stats = check_seqs(data_dir=f"{denoised_dir}/{o}_alpha_{a}_denoised", 
+                                                     fasta=file, 
+                                                     codon_1=c1, 
+                                                     codon_2=c2, 
+                                                     codon_3=c3
+                )
+            method_stats.append(file_stats)
+
+    err_counts = [site[0] for site in method_stats]
+    seq_counts = [site[1] for site in method_stats]
+    avg_err_count = sum(err_counts) / len(err_counts)
+    avg_seq_counts = sum(seq_counts) / len(seq_counts)
+    avg_err_rate = avg_err_count / avg_seq_counts
+
+    return avg_err_rate, avg_seq_counts, avg_err_count
+
+
+def make_plot(method, stat, stats):
+    fig, ax = plt.subplots()
+    x = [1, 3, 5, 7, 9, 11, 13]
+    if stat == "error rate":
+        y1 = [item[1][0] for item in stats if "no" not in item[0]]
+        y2 = [item[1][0] for item in stats if "no" in item[0]]
+    if stat == "sequence count":
+        y1 = [item[1][1] for item in stats if "no" not in item[0]]
+        y2 = [item[1][1] for item in stats if "no" in item[0]]
+    if stat == "error count":
+        y1 = [item[1][2] for item in stats if "no" not in item[0]]
+        y2 = [item[1][2] for item in stats if "no" in item[0]]
+
+    ax.plot(x, y1, label="Entropy Correction")
+    ax.plot(x, y2, linestyle="dashed", label="No Entropy")
+    ax.set_title(f"{method} {stat}")
+    ax.set_xlabel("alpha value")
+    ax.set_ylabel(f"{stat}")
+    ax.set_xticklabels(x)
+    ax.legend()
+    plt.savefig(f"../../tmp_plots/{method}_{stat}.png")
 
 if __name__ == "__main__":
 
-    data = "../../data/alignments"
+    alignment_dir = "../../data/alignments"
+    denoised_dir = "../../data/test_data/benchmarking"
     ref_file = "coi_fixed.fasta"
     ref_aligned = "coi_aligned.fasta"
     fully_aligned = "bug_aligned_coi.fasta"
+    file_suffix = ".fasta_Adcorr_denoised_d.fasta"
 
-    align_ref_sequences(data_dir = data, in_file = ref_file, outfile = ref_aligned)
-    conserved_aas =  get_conserved_aas(data_dir = data, ref_file = ref_aligned)
-
-    align_amplicon(data_dir = data, 
-                   ex_file = "coi_bug.fasta", 
-                   aligned_file = ref_aligned,
-                   fully_aligned_file = fully_aligned)
     
-    c_1, c_2, c_3 = get_conserved_base_positions("../../data/alignments", fully_aligned_file = fully_aligned)
-    error_rate = check_seqs(data_dir="../../data/test_data/benchmarking/ent_alpha_1_denoised", 
-               fasta = "BA_1_S92.fasta", 
-               codon_1=c_1, 
-               codon_2=c_2, 
-               codon_3=c_3)
+    c_1, c_2, c_3 = get_conserved_base_positions(alignment_dir, fully_aligned_file = fully_aligned)
+
+    all_stats = []
+    for alpha in [1,3,5,7,9]:
+        avg_err_rate, avg_seq_counts, avg_err_counts = get_method_avgs(denoised_dir=denoised_dir,
+                                                                    method="d",
+                                                                    o="ent",
+                                                                    a=alpha,
+                                                                    c1=c_1,
+                                                                    c2=c_2,
+                                                                    c3=c_3)
+        all_stats.append((f"ent_alpha_{alpha}", [avg_err_rate, avg_seq_counts, avg_err_counts]))
+
+    print(all_stats)
+    
+

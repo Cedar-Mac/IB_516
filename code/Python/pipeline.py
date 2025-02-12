@@ -468,7 +468,7 @@ def denoise(data_dir:str, output_dir="denoised", DnoisE_args:list=["1", "5", "3"
         - [2] --min_abund:
         - [3] --cores: 
         - [4] -y: Use entropy? -y for yes, otherwise no flag.
-        - [5] --joining: method of joing daughter to mother ()
+        - [5] --joining: method of joing daughter to mother (1: r_d, 2: r, 3, d)
 
     Outputs:
         - Denoised fasta files in subdirectory plus csv INFO files.
