@@ -16,7 +16,7 @@ pipeline.frequency_filter(data_dir=path_to_data, min_seq_count=3, min_site_occur
 
 #translation_filter()
 
-pipeline.denoise(data_dir=path_to_data)
+#pipeline.denoise(data_dir=path_to_data)
 
 #cluster_otus()
 

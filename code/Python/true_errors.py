@@ -188,7 +188,7 @@ def check_seqs(data_dir:str, fasta:str, codon_1:list, codon_2:list, codon_3:list
         num_seqs = 0
         for rawline in file.readlines():
             num_seqs += 1
-            if ">" not in rawline:
+            if (rawline.strip()) and (">" not in rawline):
                 # Two N's added to match reading frame
                 seq = "NN" + rawline.rstrip()
                 first_codon = "".join([seq[i] for i in codon_1])
@@ -219,12 +219,13 @@ def check_seqs(data_dir:str, fasta:str, codon_1:list, codon_2:list, codon_3:list
 
         return [num_errors, num_seqs, error_rate]
     
-def get_method_avgs(denoised_dir, method, o, a, c1, c2, c3):
-    method_stats = []
-    for file in os.listdir(f"{denoised_dir}/{o}_alpha_{a}_denoised"):
 
-        if f"denoised_{method}.fasta" in file:
-            file_stats = check_seqs(data_dir=f"{denoised_dir}/{o}_alpha_{a}_denoised", 
+def get_method_avgs(denoised_dir, o, a, c1, c2, c3):
+    method_stats = []
+    for file in os.listdir(f"{denoised_dir}/{o}_alpha_{a}"):
+
+        if (".csv" not in file) and ("log" not in file):
+            file_stats = check_seqs(data_dir=f"{denoised_dir}/{o}_alpha_{a}", 
                                                      fasta=file, 
                                                      codon_1=c1, 
                                                      codon_2=c2, 
@@ -241,28 +242,29 @@ def get_method_avgs(denoised_dir, method, o, a, c1, c2, c3):
     return avg_err_rate, avg_seq_counts, avg_err_count
 
 
-def make_plot(method, stat, stats):
+def make_plot(stat, stats):
     fig, ax = plt.subplots()
 
-    x = [int(*re.findall(r'\d+', item[0])) for item in stats if "no" not in item[0]]
+    x = [int(*re.findall(r'\d+', item[0])) for item in stats if "dnoise" in item[0]]
+
     if stat == "error rate":
-        y1 = [item[1][0] for item in stats if "no" not in item[0]]
-        y2 = [item[1][0] for item in stats if "no" in item[0]]
+        y1 = [item[1][0] for item in stats if "dnoise" in item[0]]
+        y2 = [item[1][0] for item in stats if "unoise" in item[0]]
     if stat == "sequence count":
-        y1 = [item[1][1] for item in stats if "no" not in item[0]]
-        y2 = [item[1][1] for item in stats if "no" in item[0]]
+        y1 = [item[1][1] for item in stats if "dnoise" in item[0]]
+        y2 = [item[1][1] for item in stats if "unoise" in item[0]]
     if stat == "error count":
-        y1 = [item[1][2] for item in stats if "no" not in item[0]]
-        y2 = [item[1][2] for item in stats if "no" in item[0]]
+        y1 = [item[1][2] for item in stats if "dnoise" in item[0]]
+        y2 = [item[1][2] for item in stats if "unoise" in item[0]]
 
     ax.plot(x, y1, label="Entropy Correction")
     ax.plot(x, y2, linestyle="dashed", label="No Entropy")
-    ax.set_title(f"{method} {stat}")
+    ax.set_title(f"{stat}")
     ax.set_xlabel("alpha value")
     ax.set_ylabel(f"{stat}")
     ax.legend()
-    plt.savefig(f"../../tmp_plots/{method}_{stat}.png")
-    print(f"{method} method '{stat}' plot saved in tmp_plots directory.")
+    plt.savefig(f"../../tmp_plots/{stat}.png")
+    print(f"{stat} plot saved in tmp_plots directory.")
 
 if __name__ == "__main__":
 
@@ -277,16 +279,16 @@ if __name__ == "__main__":
     c_1, c_2, c_3 = get_conserved_base_positions(alignment_dir, fully_aligned_file = fully_aligned)
 
     all_stats = []
-    for alpha in [1,3,5,7,9]:
-        avg_err_rate, avg_seq_counts, avg_err_counts = get_method_avgs(denoised_dir=denoised_dir,
-                                                                    method="d",
-                                                                    o="ent",
+    for option in ["dnoise", "unoise"]:
+        for alpha in [1,3,5,7,9]:
+            avg_err_rate, avg_seq_counts, avg_err_counts = get_method_avgs(denoised_dir=denoised_dir,
+                                                                    o=option,
                                                                     a=alpha,
                                                                     c1=c_1,
                                                                     c2=c_2,
                                                                     c3=c_3)
-        all_stats.append((f"ent_alpha_{alpha}", [avg_err_rate, avg_seq_counts, avg_err_counts]))
+            all_stats.append((f"{option}_alpha_{alpha}", [avg_err_rate, avg_seq_counts, avg_err_counts]))
 
-    print(all_stats)
+    make_plot("error rate", all_stats)
     
 
