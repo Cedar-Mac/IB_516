@@ -1,4 +1,4 @@
-import subprocess, os
+import subprocess, os, re
 from Bio import AlignIO
 from Bio.Seq import Seq
 import matplotlib.pyplot as plt
@@ -221,7 +221,6 @@ def check_seqs(data_dir:str, fasta:str, codon_1:list, codon_2:list, codon_3:list
     
 def get_method_avgs(denoised_dir, method, o, a, c1, c2, c3):
     method_stats = []
-    file_suffix = ".fasta_Adcorr_denoised_d.fasta"
     for file in os.listdir(f"{denoised_dir}/{o}_alpha_{a}_denoised"):
 
         if f"denoised_{method}.fasta" in file:
@@ -244,7 +243,8 @@ def get_method_avgs(denoised_dir, method, o, a, c1, c2, c3):
 
 def make_plot(method, stat, stats):
     fig, ax = plt.subplots()
-    x = [1, 3, 5, 7, 9, 11, 13]
+
+    x = [int(*re.findall(r'\d+', item[0])) for item in stats if "no" not in item[0]]
     if stat == "error rate":
         y1 = [item[1][0] for item in stats if "no" not in item[0]]
         y2 = [item[1][0] for item in stats if "no" in item[0]]
@@ -260,9 +260,9 @@ def make_plot(method, stat, stats):
     ax.set_title(f"{method} {stat}")
     ax.set_xlabel("alpha value")
     ax.set_ylabel(f"{stat}")
-    ax.set_xticklabels(x)
     ax.legend()
     plt.savefig(f"../../tmp_plots/{method}_{stat}.png")
+    print(f"{method} method '{stat}' plot saved in tmp_plots directory.")
 
 if __name__ == "__main__":
 

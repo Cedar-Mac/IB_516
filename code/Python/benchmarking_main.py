@@ -1,15 +1,8 @@
-import os, re
+import os
 import pipeline
 import true_errors
-import matplotlib.pyplot as plt
 
 path_to_data = "../../data/test_data"
-
-fasta_suffix = ".fasta"
-
-c1 = [60, 61, 62]
-c2 = [69, 70, 71]
-c3 = [96, 97, 98]
 
 if "freq_filtered" not in os.listdir(path_to_data):
     pipeline.merge_pairs(data_dir=path_to_data)
@@ -23,6 +16,11 @@ if "freq_filtered" not in os.listdir(path_to_data):
     pipeline.quality_filter(data_dir=path_to_data)
 
     pipeline.frequency_filter(data_dir=path_to_data, min_seq_count=3, min_site_occurance=3)
+
+# Copied these from 
+c1 = [60, 61, 62]
+c2 = [69, 70, 71]
+c3 = [96, 97, 98]
 
 # Run through combinations of denoising parameters
 all_stats = []
@@ -42,6 +40,7 @@ for option in ["ent", "no_ent"]:
                                                                                    c1 = c1, 
                                                                                    c2 = c2, 
                                                                                    c3 = c3)
+        
         all_stats.append((f"{option}_alpha_{alpha}", [avg_err_rate, avg_seq_counts, avg_err_counts]))
 
 
