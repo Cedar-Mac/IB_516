@@ -1,13 +1,21 @@
-# IB_516 Course Materials and Project
+# IB_516 Project
 
-This repo is a baby project. Most of the material contained here is simply course materials.
-However, for the little nugget of a project check the following subdirectories:
-- code
-- results
-- data
+This repo is a baby project. The goal of the project is two-fold:
 
-The goal of the project is to implement a pipeline for filtering and denoising fastq sequences by merging paired end reads, filtering by length and quality scores, filtering by entropy scores and by "codon integrity" (no stop codons, and 4 conserved amino acids), removing chimeric sequences, removing singletons, clustering into OTU's based on observed sequence similarity, and assigning taxon information from an uncurated database (BOLD database).
+1. Implement entropy based denoising of a COI amplicon.
+2. Benchmark various denoising methods (unoise3 algorithm, DADA2 and entropy penalized)
+3. Bonus: If time, explore other changes to the sequence processing pipeline (besides denoising)
 
-The "novel" portion will be optimizing the entropy ratio of 2nd and 3rd codon positions (measure of sequence integrity) and number of sequences removed.
-If that goes well, then I may also include some network analysis by implementing a network flavored version of the Specificity and Specificity Diversity metric.
+Here is the structure of the project:
+
+* [code](/code/)
+  * [Python](/code/Python/)
+  * [R](/code/R/)
+* [tmp_plots](/tmp_plots/)
+* [results](/results/)
+  * [final_figs/](results/final_figs)
+* [Readings](/Readings)
+* data (currently not published)
+
+The "novel" portion of this project will be optimizing denoising parameters based on "true errors." Or, in otherwords, errors which disrupt the reading frame (stop codons) or alter amino acids that are coserved across all metazoans.
 
